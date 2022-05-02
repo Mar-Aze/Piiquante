@@ -86,7 +86,7 @@ exports.getOneSauce = (req, res, next) => {
   };
 
   exports.likeSauce = (req, res, next) => {
-    Sauce.findOne({ _id: req.params.id })
+    Sauce.findOne({ _id: req.params.id }) 
     .then(sauce => { 
       if (!sauce.usersLiked.includes(req.body.userId) && req.body.like === 1) {
         Sauce.updateOne(

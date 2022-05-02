@@ -2,6 +2,9 @@
 const express = require('express');
 const app = express();
 
+//installation .env
+require('dotenv').config();
+
 //To parse incoming JSON requests and put the parsed data in req.body.
 app.use(express.json());
 
@@ -11,7 +14,7 @@ app.use(bodyParser.json());
 
 //installation mongoose
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://mazemar:LAhwKrGygtaVNgY4@piiquante.qgdw3.mongodb.net/piiquante?retryWrites=true&w=majority',
+mongoose.connect(process.env.MONGO_URL,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
