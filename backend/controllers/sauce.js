@@ -88,8 +88,8 @@ exports.getOneSauce = (req, res, next) => {
   exports.likeSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
     .then(sauce => { 
-      if (!sauce.usersLiked.includes(req.body.userId) && req.body.likes === 1) {
-        sauce.updateOne(
+      if (!sauce.usersLiked.includes(req.body.userId) && req.body.like === 1) {
+        Sauce.updateOne(
           { _id: req.params.id},
           {
             $inc: {likes: 1}, 
@@ -99,8 +99,8 @@ exports.getOneSauce = (req, res, next) => {
         .then(() => res.status(201).json({ message: "Like!"}))
         .catch(error => res.status(400).json({ error }));
       }
-      if (sauce.usersLiked.includes(req.body.userId) && req.body.likes === 0) {
-        sauce.updateOne(
+      if (sauce.usersLiked.includes(req.body.userId) && req.body.like === 0) {
+        Sauce.updateOne(
           { _id: req.params.id },
           {
             $inc: {likes: -1},
@@ -110,8 +110,8 @@ exports.getOneSauce = (req, res, next) => {
         .then(() => res.status(201).json({ message: "Like cancelled!"}))
         .catch(error => res.status(400).json({ error }));
       }
-      if(!sauce.usersDisliked.includes(req.body.userId) && req.body.likes === -1) {
-        sauce.updateOne(
+      if(!sauce.usersDisliked.includes(req.body.userId) && req.body.like === -1) {
+        Sauce.updateOne(
           { _id: req.params.id },
           {
             $inc: {dislikes: 1},
@@ -121,8 +121,8 @@ exports.getOneSauce = (req, res, next) => {
         .then(() => res.status(201).json({ message: "Dislike!"}))
         .catch(error => res.status(400).json({ error }));
       }
-      if(sauce.usersDisliked.includes(req.body.userId) && req.body.likes === 0) {
-        sauce.updateOne(
+      if(sauce.usersDisliked.includes(req.body.userId) && req.body.like === 0) {
+        Sauce.updateOne(
           { _id: req.params.id },
           {
             $inc: {dislikes: -1},
