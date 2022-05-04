@@ -31,29 +31,36 @@ exports.getOneSauce = (req, res, next) => {
   };
   
   exports.modifySauce = (req, res, next) => {
-    const sauceObject = req.file ?
-      {
-        ...JSON.parse(req.body.sauce),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-      } : { ...req.body };
-    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Sauce modifiée!'}))
-      .catch(error => res.status(400).json({ error }));
-  };
+    Sauce.findOne({ _id: req.params.id })
+      .then(sauce => {  
+        if (sauce.userId !== req.auth.userId) {
+          res.status(403).json({ message: "requête non autorisée!"});
+        } else {
+          const filename = sauce.imageUrl.split('/images/')[1];
+          fs.unlink(`images/${filename}`, () => {
+          const sauceObject = req.file ?
+          {
+            ...JSON.parse(req.body.sauce),
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+          } : { ...req.body };
+            Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+              .then(() => res.status(200).json({ message: 'Sauce modifiée!'}))
+              .catch(error => res.status(400).json({ error }))});
+        };
+     }
+  )};
    
   
  exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
       .then(sauce => {
-        if (!sauce) {
+        /*if (!sauce) {
           res.status(404).json({
             error: new Error("Cette sauce n'existe pas!")
           });
-        }
+        }*/
         if (sauce.userId !== req.auth.userId) {
-          res.status(403).json({
-            error: new Error('Requête non autorisée!')
-          });
+          res.status(403).json({message: "requête non autorisée!"});
         } else {
           const filename = sauce.imageUrl.split('/images/')[1];
           fs.unlink(`images/${filename}`, () => {
@@ -103,16 +110,24 @@ exports.getOneSauce = (req, res, next) => {
                 }
             }
             if (req.body.like === 1) {
-                if (!sauce.usersLiked.includes(req.body.userId)) {
+                if (!sauce.usersLiked.includes(req.body.userId) && !sauce.usersDisliked.includes(req.body.userId)) {
                     mongoReq = {
                         $inc: {likes: 1},
                         $push: {usersLiked: req.body.userId}
                     }
                     message = 'Like!'
+                /*} else if (!sauce.usersLiked.includes(req.body.userId) && sauce.usersDisliked.includes(req.body.userId)) {
+                    mongoReq = {
+                      $inc: {likes: 1},
+                      $inc: {dislikes: -1},
+                      $push: {usersLiked: req.body.userId},
+                      $pull: {usersDisliked: req.body.userId}
+                }
+                message = 'Dislike cancelled & Like!'*/
                 }
             }
             if (req.body.like === -1) {
-                if (!sauce.usersDisliked.includes(req.body.userId)) {
+                if (!sauce.usersDisliked.includes(req.body.userId) && !sauce.usersLiked.includes(req.body.userId)) {
                     mongoReq = {
                         $inc: {dislikes: 1},
                         $push: {usersDisliked: req.body.userId}
