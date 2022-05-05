@@ -5,6 +5,10 @@ const app = express();
 //installation .env
 require('dotenv').config();
 
+//installation helmet 
+const helmet = require('helmet');
+app.use(helmet());
+
 //To parse incoming JSON requests and put the parsed data in req.body.
 app.use(express.json());
 
