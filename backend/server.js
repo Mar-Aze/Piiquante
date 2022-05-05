@@ -9,4 +9,4 @@ const port = process.env.PORT;
 
 app.set('port', port);
 server.listen(port);
-console.log("Listening on port"+port);
+console.log(`Listening on port ${port}`);
