@@ -34,13 +34,19 @@ exports.getOneSauce = (req, res, next) => {
     );
   };
   
-  //Route PUT/Modifier une sauce
-  exports.modifySauce = (req, res, next) => {
+//Route PUT/Modifier une sauce
+ exports.modifySauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
       .then(sauce => {  
         if (sauce.userId !== req.auth.userId) {
           res.status(403).json({ message: "requête non autorisée!"});
-        } else {
+        } 
+        if (!req.file) {
+          Sauce.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+          .then(() => res.status(200).json({ message: 'Sauce modifiée!'}))
+          .catch(error => res.status(400).json({ error }))
+        }
+        else {
           const filename = sauce.imageUrl.split('/images/')[1];
           fs.unlink(`images/${filename}`, () => {
           const sauceObject = req.file ?
@@ -57,7 +63,7 @@ exports.getOneSauce = (req, res, next) => {
           res.status(404).json({error: error})
       });
     };
-  
+
    
  //Route Delete/Supprimer une sauce 
  exports.deleteSauce = (req, res, next) => {
