@@ -7,7 +7,11 @@ require('dotenv').config();
 
 //installation helmet 
 const helmet = require('helmet');
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
+
+
 
 //To parse incoming JSON requests and put the parsed data in req.body.
 app.use(express.json());
@@ -43,14 +47,5 @@ app.use('/api/sauces', sauceRoutes);
 //Lien vers les routes pour les utilisateurs
 const userRoutes = require('./routes/users');
 app.use('/api/auth', userRoutes);
-
-
-
-/*//test
-app.use((req, res) => {
-  res.json({ message: 'Votre requête a bien été reçue !' }); 
-});*/
-
-
 
 module.exports = app;
